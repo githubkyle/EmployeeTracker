@@ -16,7 +16,7 @@ function ViewAllDeps() {
   db.query("SELECT * FROM department", (err, results) => {
     if (err) throw err;
     console.table(results);
-    promptUser();
+    init();
   });
 }
 
@@ -24,7 +24,7 @@ function ViewAllRoles() {
   db.query("SELECT * FROM role", (err, results) => {
     if (err) throw err;
     console.table(results);
-    promptUser();
+    init();
   });
 }
 
@@ -32,51 +32,48 @@ function ViewAllEmps() {
   db.query("SELECT * FROM employee", (err, results) => {
     if (err) throw err;
     console.table(results);
-    promptUser();
+    init();
   });
 }
 
 function AddADep(input) {
-  db.query(`INSERT INTO department ${input} VARCHAR(30)`, (err, results) => {
+  const sql = `INSERT INTO department (name) VALUES ("${input}")`;
+  db.query(sql, [input], (err, results) => {
     if (err) throw err;
     console.table(results);
-    promptUser();
+    init();
   });
 }
 
 function AddARole(id, title, salary, dep) {
   db.query(
-    `INSERT INTO role ${(id, title, salary, dep)} INT VARCHAR(30) INT INT`,
+    `INSERT INTO role (id, title, salary, department_id) VALUES ((${id}),("${title}"),(${salary}),(${dep}))`,
     (err, results) => {
       if (err) throw err;
       console.table(results);
-      promptUser();
+      init();
     }
   );
 }
 
 function AddAnEmp(id, fName, lName, role, manager) {
   db.query(
-    `INSERT INTO employee ${(id,
-    fName,
-    lName,
-    role,
-    manager)} INT VARCHAR(30) VARCHAR(30) INT INT`,
+    `INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (${id}, "${fName}", "${lName}", ${role}, ${manager})`,
     (err, results) => {
       if (err) throw err;
       console.table(results);
-      promptUser();
+      init();
     }
   );
 }
 
 function UpEmpRole(role, id) {
   db.query(
-    `UPDATE employee SET role_id = ${role} WHERE employee_id = ${id}`,
+    `UPDATE employee SET role_id = ${role} WHERE id = ${id}`,
     (err, results) => {
       if (err) throw err;
       console.table(results);
-      promptUser();
+      init();
     }
   );
 }
@@ -114,6 +111,11 @@ const questions = [
       {
         name: "Update an employee role",
         value: "Update an employee role"
+      },
+      {
+        type: "confirm",
+        message: "All finished?",
+        name: "Finished"
       }
     ]
   },
@@ -189,11 +191,6 @@ const questions = [
     name: "UEmpR",
     when: answers => answers.choices === " Update an employee role"
   }
-  // {
-  //   type: "confirm",
-  //   message: "All finished?",
-  //   name: "is_finished"
-  // }
 ];
 
 // const promptUser = () => {
@@ -365,22 +362,30 @@ const promptUser = questions => {
         AddADep(answers.NewDep);
         break;
       case "Add a role":
-        AddARole(NewRoleId, NewRoleTitle, NewRoleSal, NewRoleDept);
+        AddARole(
+          answers.NewRoleId,
+          answers.NewRoleTitle,
+          answers.NewRoleSal,
+          answers.NewRoleDept
+        );
         break;
       case "Add an employee":
-        AddAnEmp(EmpID, EmpF, EmpL, EmpR, EmpM);
+        AddAnEmp(
+          answers.EmpID,
+          answers.EmpF,
+          answers.EmpL,
+          answers.EmpR,
+          answers.EmpM
+        );
         break;
       case "Update an employee role":
-        UpEmpRole(UEmpID, UEmpR);
+        UpEmpRole(answers.UEmpID, answers.UEmpR);
         break;
+      case "Finished":
+        return;
       default:
         console.log("Sorry, make another selection.");
         break;
-    }
-    if (answers.is_finished) {
-      return;
-    } else {
-      return promptUser(questions);
     }
   });
 };
