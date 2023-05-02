@@ -68,6 +68,8 @@ function AddAnEmp(id, fName, lName, role, manager) {
 }
 
 function UpEmpRole(role, id) {
+  console.log(role);
+  console.log(id);
   db.query(
     `UPDATE employee SET role_id = ${role} WHERE id = ${id}`,
     (err, results) => {
@@ -183,13 +185,13 @@ const questions = [
     type: "input",
     message: "Which worker would you like to update?",
     name: "UEmpID",
-    when: answers => answers.choices === " Update an employee role"
+    when: answers => answers.choices === "Update an employee role"
   },
   {
     type: "input",
     message: "What new role would you like to place them into?",
     name: "UEmpR",
-    when: answers => answers.choices === " Update an employee role"
+    when: answers => answers.choices === "Update an employee role"
   }
 ];
 
