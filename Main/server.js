@@ -183,13 +183,13 @@ const questions = [
   },
   {
     type: "input",
-    message: "Which worker would you like to update?",
+    message: "Which worker, by ID, would you like to update?",
     name: "UEmpID",
     when: answers => answers.choices === "Update an employee role"
   },
   {
     type: "input",
-    message: "What new role would you like to place them into?",
+    message: "What new role ID would you like to give them?",
     name: "UEmpR",
     when: answers => answers.choices === "Update an employee role"
   }
@@ -393,9 +393,7 @@ const promptUser = questions => {
 };
 
 const init = () => {
-  promptUser(questions)
-    // .then(() => )
-    .catch(err => console.error(err));
+  promptUser(questions).catch(err => console.error(err));
 };
 
 init();
